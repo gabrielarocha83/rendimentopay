@@ -1,1 +1,3 @@
 version = 1
+test_patterns = ["*/tests//", "*/test//", "*/spec//"]
+exclude_patterns = ["*/migrations//", "*/tests//"]
