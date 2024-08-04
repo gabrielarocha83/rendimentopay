@@ -1,7 +1,6 @@
-﻿namespace RendimentoPay.Core.Domain.Response.Dominio
+﻿namespace RendimentoPay.Core.Domain.Response.Dominio;
+
+public class ConteudoSaldo
 {
-    public class ConteudoSaldo
-    {
-        public float saldo { get; set; }
-    }
+  public float saldo { get; set; }
 }

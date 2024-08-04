@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RendimentoPay.Core.Services")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+450a1a5531ab9afe858eb44bfdd097fffd3a13de")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cbdad579528f6214bfbdc3f73ab8f43ceb5432f4")]
 [assembly: System.Reflection.AssemblyProductAttribute("RendimentoPay.Core.Services")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RendimentoPay.Core.Services")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

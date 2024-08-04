@@ -5,113 +5,73 @@ using RendimentoPay.Core.Domain.Response;
 using RendimentoPay.Core.Services.Interface;
 using System.Text.Json;
 
-namespace RendimentoPay.Core.Services.Services
+namespace RendimentoPay.Core.Services.Services;
+
+/// <summary>
+/// Serviço de carga e descarga de saldo em conta
+/// </summary>
+public class ContaCargaService : IContaCargaService
 {
-    /// <summary>
-    /// Serviço de carga e descarga de saldo em conta
-    /// </summary>
-    public class ContaCargaService : IContaCargaService
+  private readonly HttpClient _httpClient;
+  private readonly IRedisManagerService _redis;
+  private readonly RequestBuilder _requestBuilder;
+  private readonly bool _habilitaRedis;
+  private readonly ILogger<ContaCargaService> _logger;
+
+  public ContaCargaService(RequestBuilder requestBuilder, IRedisManagerService redis, IConfiguration configuration, ILogger<ContaCargaService> logger)
+  {
+    _httpClient = new HttpClient();
+    _redis = redis; // Inicialize o campo com o serviço injetado
+    _requestBuilder = new RequestBuilder();
+    _habilitaRedis = Convert.ToBoolean(configuration.GetRequiredSection("CacheSettings").GetSection("HabilitaRedis").Value);
+    _logger = logger;
+    _requestBuilder = requestBuilder;
+  }
+
+  public async Task<ContaCargaPositivaResponse> Carga(ContaCargaPositivaRequest dados, AccessToken accessToken, Boolean boLocal = true)
+  {
+    if (dados == null)
     {
-        private readonly HttpClient _httpClient;
-        private readonly IRedisManagerService _redis;
-        private readonly RequestBuilder _requestBuilder;
-        private readonly bool _habilitaRedis;
-        private readonly ILogger<ContaCargaService> _logger;        
-        
-        public ContaCargaService(RequestBuilder requestBuilder, IRedisManagerService redis, IConfiguration configuration, ILogger<ContaCargaService> logger)
-        {
-            _httpClient = new HttpClient();
-            _redis = redis; // Inicialize o campo com o serviço injetado
-            _requestBuilder = new RequestBuilder();
-            _habilitaRedis = Convert.ToBoolean(configuration.GetRequiredSection("CacheSettings").GetSection("HabilitaRedis").Value);
-            _logger = logger;
-            _requestBuilder = requestBuilder;
-        }
+      throw new ArgumentNullException(nameof(dados), "O objeto 'dados' não pode ser nulo.");
+    }
 
-        public async Task<ContaCargaPositivaResponse> Carga(ContaCargaPositivaRequest dados, AccessToken accessToken)
-        {
-            if (dados == null)
-            {
-                throw new ArgumentNullException(nameof(dados), "O objeto 'dados' não pode ser nulo.");
-            }
+    if (accessToken == null)
+    {
+      throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
+    }
 
-            if (accessToken == null)
-            {
-                throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
-            }
+    var endpoint = $"/Pix/Rendcard/Carga";
+    var request = _requestBuilder.BuildPostRequest(endpoint, dados, accessToken);
 
-            var endpoint = $"/Pix/Rendcard/Carga";
-            var request = _requestBuilder.BuildPostRequest(endpoint, dados, accessToken);
+    // Habilitar Log
+    _logger.LogInformation("Request: {Method} {Url} {Headers} {Body}",
+     request.Method, request.RequestUri, request.Headers, JsonSerializer.Serialize(request));
 
-            // Habilitar Log
-            _logger.LogInformation("Request: {Method} {Url} {Headers} {Body}",
-             request.Method, request.RequestUri, request.Headers, JsonSerializer.Serialize(request));
+    string responseBody = string.Empty;
+    ContaCargaPositivaResponse resultado = new ContaCargaPositivaResponse();
+    try
+    {
+      if (!boLocal)
+      {
+        HttpResponseMessage response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
 
-            try
-            {
-                HttpResponseMessage response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
+        responseBody = await response.Content.ReadAsStringAsync();
+        resultado = JsonSerializer.Deserialize<ContaCargaPositivaResponse>(responseBody);
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                ContaCargaPositivaResponse resultado = JsonSerializer.Deserialize<ContaCargaPositivaResponse>(responseBody);
+        // Implemente o salvamento de dados no _redis
+        // if (_habilitaRedis)
+        // {
+        //     _redis.SetKeyValue("token", resultado.access_token);
+        // }
 
-                // Implemente o salvamento de dados no _redis
-                // if (_habilitaRedis)
-                // {
-                //     _redis.SetKeyValue("token", resultado.access_token);
-                // }
-
-                // Habilitar Log
-                _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
-                 response.StatusCode, response.Headers, responseBody);
-
-                return resultado;
-            }
-            catch (Exception ex)
-            {
-                // Habilitar Log
-                _logger.LogError("Response: {StatusCode} {Headers} {Body}",
-                "400", "cabecalhos", "body");
-
-                throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
-            }
-        }
-
-        public async Task<ContaCargaNegativaResponse> Descarga(ContaCargaNegativaRequest dados, AccessToken accessToken, Boolean boLocal = true)
-        {            
-            if (dados == null)
-            {
-                throw new ArgumentNullException(nameof(dados), "O objeto 'dados' não pode ser nulo.");
-            }
-
-            if (accessToken == null)
-            {
-                throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
-            }
-          
-            var endpoint = $"/Pix/Rendcard/Descarga";
-            var request = _requestBuilder.BuildPostRequest(endpoint, dados, accessToken);
-
-            // Habilitar Log
-            _logger.LogInformation("Request: {Method} {Url} {Headers} {Body}",
-             request.Method, request.RequestUri, request.Headers, JsonSerializer.Serialize(request));
-            
-            HttpResponseMessage response = new HttpResponseMessage();
-            string responseBody = "";
-            ContaCargaNegativaResponse resultado = new();
-            try
-            {
-                if (!boLocal)
-                {
-                    response.EnsureSuccessStatusCode();
-
-                    response = await _httpClient.SendAsync(request);
-                    responseBody = await response.Content.ReadAsStringAsync();
-                    resultado = JsonSerializer.Deserialize<ContaCargaNegativaResponse>(responseBody);
-                }
-                else
-                {
-                    responseBody = @"{
+        // Habilitar Log
+        _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
+         response.StatusCode, response.Headers, responseBody);
+      }
+      else
+      {
+        responseBody = @"{
                                                 ""value"": null,
                                                 ""message"": null,
                                                 ""transactionId"": ""f4c1216a-d402-4414-9aae-43431920546b"",
@@ -129,59 +89,126 @@ namespace RendimentoPay.Core.Services.Services
                                                 ""isSuccess"": true,
                                                 ""isFailure"": false
                                             }";
-                    resultado = JsonSerializer.Deserialize<ContaCargaNegativaResponse>(responseBody);
-                }
-                // Implemente o salvamento de dados no _redis
-                // if (_habilitaRedis)
-                // {
-                //     _redis.SetKeyValue("token", resultado.access_token);
-                // }
+        resultado = JsonSerializer.Deserialize<ContaCargaPositivaResponse>(responseBody);
+      }
 
-                // Habilitar Log
-                _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
-                 response.StatusCode, response.Headers, responseBody);               
+      return resultado;
+    }
+    catch (Exception ex)
+    {
+      // Habilitar Log
+      _logger.LogError("Response: {StatusCode} {Headers} {Body}",
+      "400", "cabecalhos", "body");
 
-                return resultado;
-            }
-            catch (Exception ex)
-            {
-                // Habilitar Log
-                _logger.LogError("Response: {StatusCode} {Headers} {Body}",
-                "400", "cabecalhos", "body");                
+      throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
+    }
+  }
 
-                throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
-            }
-        }
+  public async Task<ContaCargaNegativaResponse> Descarga(ContaCargaNegativaRequest dados, AccessToken accessToken, Boolean boLocal = true)
+  {
+    if (dados == null)
+    {
+      throw new ArgumentNullException(nameof(dados), "O objeto 'dados' não pode ser nulo.");
+    }
 
-        public async Task<ContaSaldoResponse> Saldo(AccessToken accessToken, Boolean boLocal = true)
-        {
-            if (accessToken == null)
-            {
-                throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
-            }
+    if (accessToken == null)
+    {
+      throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
+    }
 
-            var endpoint = $"/Pix/Rendcard/Agencia/{accessToken.Agencia}/Conta/{accessToken.Conta}/saldo";
-            var request = _requestBuilder.BuildGetRequest(endpoint, accessToken);
+    var endpoint = $"/Pix/Rendcard/Descarga";
+    var request = _requestBuilder.BuildPostRequest(endpoint, dados, accessToken);
 
-            _logger.LogInformation("Request: {Method} {Url} {Headers} ",
-             request.Method, request.RequestUri, request.Headers);
+    // Habilitar Log
+    _logger.LogInformation("Request: {Method} {Url} {Headers} {Body}",
+     request.Method, request.RequestUri, request.Headers, JsonSerializer.Serialize(request));
 
-            HttpResponseMessage response = new HttpResponseMessage();
-            string responseBody = "";
-            ContaSaldoResponse resultado = new ContaSaldoResponse();
-            try
-            {
-                if (!boLocal)
-                {
-                    response.EnsureSuccessStatusCode();
+    HttpResponseMessage response = new HttpResponseMessage();
+    string responseBody = "";
+    ContaCargaNegativaResponse resultado = new();
+    try
+    {
+      if (!boLocal)
+      {
+        response.EnsureSuccessStatusCode();
 
-                    response = await _httpClient.SendAsync(request);
-                    responseBody = await response.Content.ReadAsStringAsync();
-                    resultado = JsonSerializer.Deserialize<ContaSaldoResponse>(responseBody);
-                }
-                else
-                {
-                    responseBody = @"{
+        response = await _httpClient.SendAsync(request);
+        responseBody = await response.Content.ReadAsStringAsync();
+        resultado = JsonSerializer.Deserialize<ContaCargaNegativaResponse>(responseBody);
+      }
+      else
+      {
+        responseBody = @"{
+                                                ""value"": null,
+                                                ""message"": null,
+                                                ""transactionId"": ""f4c1216a-d402-4414-9aae-43431920546b"",
+                                                ""erroMessage"": {
+                                                    ""statusCode"": 404,
+                                                    ""message"": ""Não foi possível realizar a sensibilização negativa da conta."",
+                                                    ""errors"": [
+                                                        {
+                                                            ""domain"": ""E00000"",
+                                                            ""reason"": null,
+                                                            ""message"": ""Nenhuma chave encontrada""
+                                                        }
+                                                    ]
+                                                },
+                                                ""isSuccess"": true,
+                                                ""isFailure"": false
+                                            }";
+        resultado = JsonSerializer.Deserialize<ContaCargaNegativaResponse>(responseBody);
+      }
+      // Implemente o salvamento de dados no _redis
+      // if (_habilitaRedis)
+      // {
+      //     _redis.SetKeyValue("token", resultado.access_token);
+      // }
+
+      // Habilitar Log
+      _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
+       response.StatusCode, response.Headers, responseBody);
+
+      return resultado;
+    }
+    catch (Exception ex)
+    {
+      // Habilitar Log
+      _logger.LogError("Response: {StatusCode} {Headers} {Body}",
+      "400", "cabecalhos", "body");
+
+      throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
+    }
+  }
+
+  public async Task<ContaSaldoResponse> Saldo(AccessToken accessToken, Boolean boLocal = true)
+  {
+    if (accessToken == null)
+    {
+      throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
+    }
+
+    var endpoint = $"/Pix/Rendcard/Agencia/{accessToken.Agencia}/Conta/{accessToken.Conta}/saldo";
+    var request = _requestBuilder.BuildGetRequest(endpoint, accessToken);
+
+    _logger.LogInformation("Request: {Method} {Url} {Headers} ",
+     request.Method, request.RequestUri, request.Headers);
+
+    HttpResponseMessage response = new HttpResponseMessage();
+    string responseBody = "";
+    ContaSaldoResponse resultado = new ContaSaldoResponse();
+    try
+    {
+      if (!boLocal)
+      {
+        response.EnsureSuccessStatusCode();
+
+        response = await _httpClient.SendAsync(request);
+        responseBody = await response.Content.ReadAsStringAsync();
+        resultado = JsonSerializer.Deserialize<ContaSaldoResponse>(responseBody);
+      }
+      else
+      {
+        responseBody = @"{
                                                 ""saldo"": 1000,
                                                 ""message"": null,
                                                 ""transactionId"": ""f4c1216a-d402-4414-9aae-43431920546b"",
@@ -199,100 +226,100 @@ namespace RendimentoPay.Core.Services.Services
                                                 ""isSuccess"": true,
                                                 ""isFailure"": false
                                             }";
-                    resultado = JsonSerializer.Deserialize<ContaSaldoResponse>(responseBody);
-                }
-                            
-                // Implemente o salvamento de dados no _redis
-                // if (_habilitaRedis)
-                // {
-                //     _redis.SetKeyValue("token", resultado.access_token);
-                // }
+        resultado = JsonSerializer.Deserialize<ContaSaldoResponse>(responseBody);
+      }
 
-                // Implemente a lógica de salvamento no banco conforme necessário
-                
-                _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
-                 response.StatusCode, response.Headers, responseBody);
+      // Implemente o salvamento de dados no _redis
+      // if (_habilitaRedis)
+      // {
+      //     _redis.SetKeyValue("token", resultado.access_token);
+      // }
 
-                return resultado;
-            }
-            catch (Exception ex)
-            {
-                // Registra exceção no log se necessário
-                throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
-            }
-        }
+      // Implemente a lógica de salvamento no banco conforme necessário
 
-        public async Task<ContaConsultaResponse> Consulta(AccessToken accessToken)
-        {
-            if (accessToken == null)
-            {
-                throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
-            }
+      _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
+       response.StatusCode, response.Headers, responseBody);
 
-            var endpoint = $"/Pix/Rendcard/NumeroDeIdentificacaoLegado/2302705176500010702/Documento/27051765000107";            
-            var request = _requestBuilder.BuildGetRequest(endpoint, accessToken);
+      return resultado;
+    }
+    catch (Exception ex)
+    {
+      // Registra exceção no log se necessário
+      throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
+    }
+  }
 
-            _logger.LogInformation("Request: {Method} {Url} {Headers} ",
-             request.Method, request.RequestUri, request.Headers);
+  public async Task<ContaConsultaResponse> Consulta(AccessToken accessToken)
+  {
+    if (accessToken == null)
+    {
+      throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
+    }
 
-            try
-            {
-                HttpResponseMessage response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
+    var endpoint = $"/Pix/Rendcard/NumeroDeIdentificacaoLegado/2302705176500010702/Documento/27051765000107";
+    var request = _requestBuilder.BuildGetRequest(endpoint, accessToken);
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                ContaConsultaResponse resultado = JsonSerializer.Deserialize<ContaConsultaResponse>(responseBody);
+    _logger.LogInformation("Request: {Method} {Url} {Headers} ",
+     request.Method, request.RequestUri, request.Headers);
 
-                // Implemente o salvamento de dados no _redis
-                // if (_habilitaRedis)
-                // {
-                //     _redis.SetKeyValue("token", resultado.access_token);
-                // }
+    try
+    {
+      HttpResponseMessage response = await _httpClient.SendAsync(request);
+      response.EnsureSuccessStatusCode();
 
-                // Implemente a lógica de salvamento no banco conforme necessário
+      string responseBody = await response.Content.ReadAsStringAsync();
+      ContaConsultaResponse resultado = JsonSerializer.Deserialize<ContaConsultaResponse>(responseBody);
 
-                _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
-                 response.StatusCode, response.Headers, responseBody);
+      // Implemente o salvamento de dados no _redis
+      // if (_habilitaRedis)
+      // {
+      //     _redis.SetKeyValue("token", resultado.access_token);
+      // }
 
-                return resultado;
-            }
-            catch (Exception ex)
-            {
-                // Registra exceção no log se necessário
-                throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
-            }
-        }       
+      // Implemente a lógica de salvamento no banco conforme necessário
 
-        public async Task<ContaValidaExistenciaResponse> ValidaExistencia(ContaValidaExistenciaRequest dados, AccessToken accessToken, Boolean boLocal = true)
-        {
-            if (accessToken == null)
-            {
-                throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
-            }
+      _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
+       response.StatusCode, response.Headers, responseBody);
 
-            var endpoint = $"/Pix/Rendcard/Conta";
-            var request = _requestBuilder.BuildPatchRequest(endpoint, dados, accessToken);
+      return resultado;
+    }
+    catch (Exception ex)
+    {
+      // Registra exceção no log se necessário
+      throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
+    }
+  }
 
-            _logger.LogInformation("Request: {Method} {Url} {Headers} ",
-             request.Method, request.RequestUri, request.Headers);
+  public async Task<ContaValidaExistenciaResponse> ValidaExistencia(ContaValidaExistenciaRequest dados, AccessToken accessToken, Boolean boLocal = true)
+  {
+    if (accessToken == null)
+    {
+      throw new ArgumentNullException(nameof(accessToken), "O objeto 'accessToken' não pode ser nulo.");
+    }
 
-            HttpResponseMessage response = new HttpResponseMessage();
-            string responseBody = "";
-            ContaValidaExistenciaResponse resultado = new ContaValidaExistenciaResponse();
-            try
-            {
-                if (!boLocal)
-                {
-                    
-                    response.EnsureSuccessStatusCode();
+    var endpoint = $"/Pix/Rendcard/Conta";
+    var request = _requestBuilder.BuildPatchRequest(endpoint, dados, accessToken);
 
-                    response = await _httpClient.SendAsync(request);
-                    responseBody = await response.Content.ReadAsStringAsync();
-                    resultado = JsonSerializer.Deserialize<ContaValidaExistenciaResponse>(responseBody);
-                }
-                else
-                {
-                    responseBody = @"{
+    _logger.LogInformation("Request: {Method} {Url} {Headers} ",
+     request.Method, request.RequestUri, request.Headers);
+
+    HttpResponseMessage response = new HttpResponseMessage();
+    string responseBody = "";
+    ContaValidaExistenciaResponse resultado = new ContaValidaExistenciaResponse();
+    try
+    {
+      if (!boLocal)
+      {
+
+        response.EnsureSuccessStatusCode();
+
+        response = await _httpClient.SendAsync(request);
+        responseBody = await response.Content.ReadAsStringAsync();
+        resultado = JsonSerializer.Deserialize<ContaValidaExistenciaResponse>(responseBody);
+      }
+      else
+      {
+        responseBody = @"{
                                                 ""value"": null,
                                                 ""message"": null,
                                                 ""transactionId"": ""f4c1216a-d402-4414-9aae-43431920546b"",
@@ -310,27 +337,26 @@ namespace RendimentoPay.Core.Services.Services
                                                 ""isSuccess"": true,
                                                 ""isFailure"": false
                                             }";
-                    resultado = JsonSerializer.Deserialize<ContaValidaExistenciaResponse>(responseBody);
-                }
+        resultado = JsonSerializer.Deserialize<ContaValidaExistenciaResponse>(responseBody);
+      }
 
-                // Implemente o salvamento de dados no _redis
-                // if (_habilitaRedis)
-                // {
-                //     _redis.SetKeyValue("token", resultado.access_token);
-                // }
+      // Implemente o salvamento de dados no _redis
+      // if (_habilitaRedis)
+      // {
+      //     _redis.SetKeyValue("token", resultado.access_token);
+      // }
 
-                // Implemente a lógica de salvamento no banco conforme necessário
+      // Implemente a lógica de salvamento no banco conforme necessário
 
-                _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
-                 response.StatusCode, response.Headers, responseBody);
+      _logger.LogInformation("Response: {StatusCode} {Headers} {Body}",
+       response.StatusCode, response.Headers, responseBody);
 
-                return resultado;
-            }
-            catch (Exception ex)
-            {
-                // Registra exceção no log se necessário
-                throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
-            }
-        }       
+      return resultado;
     }
+    catch (Exception ex)
+    {
+      // Registra exceção no log se necessário
+      throw new InvalidOperationException($"Ocorreu um erro enquanto processava a requisição. {ex.Message}", ex);
+    }
+  }
 }

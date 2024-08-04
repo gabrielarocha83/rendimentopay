@@ -1,7 +1,6 @@
-﻿namespace RendimentoPay.Core.Domain.Response.Dominio
+﻿namespace RendimentoPay.Core.Domain.Response.Dominio;
+
+public class Value
 {
-    public class Value
-    {
-        public Ordempagamento ordemPagamento { get; set; }
-    }
+  public Ordempagamento ordemPagamento { get; set; }
 }

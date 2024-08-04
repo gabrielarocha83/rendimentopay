@@ -11,17 +11,17 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Rendimento.Core/Rendimento.Core.csproj", "Rendimento.Core/"]
-RUN dotnet restore "./Rendimento.Core/Rendimento.Core.csproj"
+COPY ["RendimentoPay.Core/RendimentoPay.Core.csproj", "RendimentoPay.Core/"]
+RUN dotnet restore "./RendimentoPay.Core/RendimentoPay.Core.csproj"
 COPY . .
-WORKDIR "/src/Rendimento.Core"
-RUN dotnet build "./Rendimento.Core.csproj" -c %BUILD_CONFIGURATION% -o /app/build
+WORKDIR "/src/RendimentoPay.Core"
+RUN dotnet build "./RendimentoPay.Core.csproj" -c %BUILD_CONFIGURATION% -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Rendimento.Core.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./RendimentoPay.Core.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Rendimento.Core.dll"]
+ENTRYPOINT ["dotnet", "RendimentoPay.Core.dll"]

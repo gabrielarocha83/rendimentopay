@@ -1,6 +1,6 @@
-@Rendimento.Core_HostAddress = http://localhost:5133
+@RendimentoPay.Core_HostAddress = http://localhost:5133
 
-GET {{Rendimento.Core_HostAddress}}/weatherforecast/
+GET {{@RendimentoPay.Core_HostAddress}}/swagger/
 Accept: application/json
 
 ###

@@ -1,10 +1,9 @@
 ﻿using RendimentoPay.Core.Domain.Request;
 using RendimentoPay.Core.Domain.Response;
 
-namespace RendimentoPay.Core.Services.Interface
+namespace RendimentoPay.Core.Services.Interface;
+
+public interface IAutenticacaoService
 {
-    public interface IAutenticacaoService
-    {        
-        Task<AutenticacaoResponse> Autenticar(AutenticacaoRequest request, Domain.Request.AccessToken token);
-    }
+  Task<AutenticacaoResponse> Autenticar(AutenticacaoRequest request, Domain.Request.AccessToken token);
 }
