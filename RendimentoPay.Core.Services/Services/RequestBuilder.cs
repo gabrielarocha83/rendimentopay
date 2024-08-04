@@ -105,7 +105,7 @@ public class RequestBuilder
         _request = new HttpRequestMessage(HttpMethod.Post, _urlapi_localHost + endpoint);
 
         BuildDictRequestBase(accessToken);
-        if (accessToken.chaveAcesso != "")
+        if (string.IsNullOrWhiteSpace(accessToken.chaveAcesso))
         {
             BuildRequestBaseCh(accessToken);
         }

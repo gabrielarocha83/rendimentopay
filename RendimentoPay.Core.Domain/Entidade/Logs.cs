@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
-public class Log
+namespace RendimentoPay.Core.Domain.Request.Dominio
 {
+  public class Log
+  {
     [Key]
     public int Id { get; set; }
 
@@ -20,4 +21,5 @@ public class Log
     public string Properties { get; set; }
 
     public string LogEvent { get; set; }
+  }
 }

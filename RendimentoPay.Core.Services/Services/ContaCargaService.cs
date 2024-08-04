@@ -98,7 +98,7 @@ namespace RendimentoPay.Core.Services.Services
             
             HttpResponseMessage response = new HttpResponseMessage();
             string responseBody = "";
-            ContaCargaNegativaResponse resultado = new ContaCargaNegativaResponse();
+            ContaCargaNegativaResponse resultado = new();
             try
             {
                 if (!boLocal)

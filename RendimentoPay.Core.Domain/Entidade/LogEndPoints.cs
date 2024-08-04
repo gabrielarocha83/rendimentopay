@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
-public class LogEndPoint
+namespace RendimentoPay.Core.Domain.Request.Dominio
 {
+  public class LogEndPoint
+  {
     [Key]
     public int ID { get; set; }
 
@@ -35,4 +36,5 @@ public class LogEndPoint
 
     [Required]
     public DateTime DataHora { get; set; } = DateTime.Now;
+  }
 }
