@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "xK6Hadhtbvzdp3kmZaceK8K3kZ9SCYNRv6YxJ67Fw4E=",
+  "Source": "RendimentoPay.Core.Api",
+  "BasePath": "_content/RendimentoPay.Core.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

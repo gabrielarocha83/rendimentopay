@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\RendimentoPay.Core.Api.props" />
+</Project>

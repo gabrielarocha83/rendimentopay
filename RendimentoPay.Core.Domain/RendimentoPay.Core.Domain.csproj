@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Request\DTO\**" />
+    <Compile Remove="Response\DTO\**" />
+    <EmbeddedResource Remove="Request\DTO\**" />
+    <EmbeddedResource Remove="Response\DTO\**" />
+    <None Remove="Request\DTO\**" />
+    <None Remove="Response\DTO\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="4.0.1" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="6.6.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+</Project>

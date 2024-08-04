@@ -1,0 +1,13 @@
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\bin\Debug\net8.0\RendimentoPay.Core.Domain.deps.json
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\bin\Debug\net8.0\RendimentoPay.Core.Domain.dll
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\bin\Debug\net8.0\RendimentoPay.Core.Domain.pdb
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\RendimentoPay.Core.Domain.csproj.AssemblyReference.cache
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\RendimentoPay.Core.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\RendimentoPay.Core.Domain.AssemblyInfoInputs.cache
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\RendimentoPay.Core.Domain.AssemblyInfo.cs
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\RendimentoPay.Core.Domain.csproj.CoreCompileInputs.cache
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\RendimentoPay.Core.Domain.sourcelink.json
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\RendimentoPay.Core.Domain.dll
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\refint\RendimentoPay.Core.Domain.dll
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\RendimentoPay.Core.Domain.pdb
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Domain\obj\Debug\net8.0\ref\RendimentoPay.Core.Domain.dll

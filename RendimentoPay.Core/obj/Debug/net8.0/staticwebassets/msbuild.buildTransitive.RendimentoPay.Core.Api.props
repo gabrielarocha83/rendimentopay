@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\RendimentoPay.Core.Api.props" />
+</Project>

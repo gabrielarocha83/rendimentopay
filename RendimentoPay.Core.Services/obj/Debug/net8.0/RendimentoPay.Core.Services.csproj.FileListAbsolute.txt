@@ -1,0 +1,16 @@
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\RendimentoPay.Core.Services.csproj.AssemblyReference.cache
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\RendimentoPay.Core.Services.GeneratedMSBuildEditorConfig.editorconfig
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\RendimentoPay.Core.Services.AssemblyInfoInputs.cache
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\RendimentoPay.Core.Services.AssemblyInfo.cs
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\RendimentoPay.Core.Services.csproj.CoreCompileInputs.cache
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\RendimentoPay.Core.Services.sourcelink.json
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\bin\Debug\net8.0\RendimentoPay.Core.Services.deps.json
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\bin\Debug\net8.0\RendimentoPay.Core.Services.dll
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\bin\Debug\net8.0\RendimentoPay.Core.Services.pdb
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\bin\Debug\net8.0\RendimentoPay.Core.Domain.dll
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\bin\Debug\net8.0\RendimentoPay.Core.Domain.pdb
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\Rendimen.852DD875.Up2Date
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\RendimentoPay.Core.Services.dll
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\refint\RendimentoPay.Core.Services.dll
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\RendimentoPay.Core.Services.pdb
+D:\ProjetoIvy\core-agillitas\Rendimento.Core\RendimentoPay.Core.Services\obj\Debug\net8.0\ref\RendimentoPay.Core.Services.dll
